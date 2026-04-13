@@ -3,178 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi Perpustakaan SMPN 4 MONTA</title>
+    <title>SMP NEGERI 4 MONTA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
         :root {
             --gold-primary: #D4AF37;
             --gold-light: #F9E498;
             --gold-dark: #996515;
-            --vip-black: #1a1a1a;
+            --sidebar-width: 260px;
         }
 
         body { 
-            font-family: 'Inter', sans-serif; 
-            background: radial-gradient(circle at top, #2c2c2c 0%, #121212 100%);
-            color: #e0e0e0;
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #0f0f12;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-primary) 50%, var(--gold-light) 100%);
         }
 
         .gold-text {
             background: linear-gradient(to right, var(--gold-light), var(--gold-primary), var(--gold-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-family: 'Playfair Display', serif;
         }
 
-        .vip-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .btn-gold {
-            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-primary) 50%, var(--gold-light) 100%);
-            color: #1a1a1a;
-            font-weight: 700;
+        .sidebar {
+            width: var(--sidebar-width);
+            background: rgba(18, 18, 23, 0.95);
+            border-right: 1px solid rgba(212, 175, 55, 0.1);
+            backdrop-filter: blur(20px);
             transition: all 0.3s ease;
         }
 
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        .nav-item {
+            margin: 4px 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #94a3b8;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .nav-tab.active {
-            border-bottom: 2px solid var(--gold-primary);
-            color: var(--gold-primary);
+        .nav-item:hover {
+            background: rgba(212, 175, 55, 0.05);
+            color: var(--gold-light);
         }
-        
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #1a1a1a; }
-        ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 10px; }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+            color: var(--gold-primary);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .app-card {
+            background: rgba(26, 26, 33, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        input, select, textarea {
+            background: rgba(10, 10, 12, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--gold-primary) !important;
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.2); border-radius: 10px; }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 50; height: 100vh; }
+            .sidebar.open { transform: translateX(0); }
+        }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="flex min-h-screen">
 
-    <div class="max-w-4xl mx-auto px-4 pt-10">
-        <!-- Header Luxury -->
-        <div class="text-center mb-12">
-            <div class="inline-block p-1 border-b-2 border-gold-primary mb-4">
-                <span class="uppercase tracking-[0.3em] text-[10px] text-gray-400">Official Membership Portal</span>
+    <!-- Mobile Menu Toggle -->
+    <button onclick="toggleSidebar()" class="lg:hidden fixed bottom-6 right-6 z-[60] gold-gradient w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-black">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar h-screen sticky top-0 flex flex-col shrink-0">
+        <div class="p-8 text-center">
+            <h1 class="text-2xl font-black gold-text tracking-tighter flex items-center justify-center gap-2">
+                <i class="fas fa-crown"></i> LIBRARY
+
+            </h1>
+            <p class="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1">SMP NEGERI 4 MONTA</p>
+        </div>
+
+        <nav class="flex-1 mt-4">
+            <div onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-item active">
+                <i class="fas fa-th-large w-5"></i> Dashboard
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold gold-text mb-2">SMPN 4 MONTA</h1>
-            <p class="text-gray-400 tracking-widest uppercase text-sm font-light">Library Attendance System 2025/2026</p>
-        </div>
+            <div onclick="switchTab('absensi')" id="tab-absensi" class="nav-item">
+                <i class="fas fa-clipboard-user w-5"></i> Presensi Petugas
+            </div>
+            <div onclick="switchTab('perpus')" id="tab-perpus" class="nav-item">
+                <i class="fas fa-book w-5"></i> Katalog Buku
+            </div>
+            <div onclick="switchTab('transaksi')" id="tab-transaksi" class="nav-item">
+                <i class="fas fa-exchange-alt w-5"></i> Peminjaman
+            </div>
+            <div class="px-8 mt-10 mb-2 text-[10px] text-gray-600 uppercase font-bold tracking-widest">Administrator</div>
+            <div onclick="switchTab('kelola')" id="tab-kelola" class="nav-item">
+                <i class="fas fa-sliders w-5"></i> Pengaturan Sistem
+            </div>
+        </nav>
 
-        <!-- Navigation Menu -->
-        <div class="flex justify-center gap-8 mb-8 border-b border-white/10 text-sm font-semibold tracking-wider">
-            <button onclick="switchTab('absensi')" id="tab-absensi" class="nav-tab active pb-4 transition-all">ABSENSI</button>
-            <button onclick="switchTab('riwayat')" id="tab-riwayat" class="nav-tab pb-4 transition-all text-gray-500">RIWAYAT</button>
-            <button onclick="switchTab('kelola')" id="tab-kelola" class="nav-tab pb-4 transition-all text-gray-500">KELOLA ANGGOTA</button>
+        <div class="p-6 text-center text-[10px] text-gray-600 border-t border-white/5">
+            SMP NEGERI 4 MONTA &copy; 2026
         </div>
+    </aside>
 
-        <!-- Section: Absensi -->
-        <div id="section-absensi" class="tab-content">
-            <div class="vip-card rounded-3xl p-6 mb-8 text-center md:text-left">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <p id="dateDisplay" class="text-gold-light font-medium"></p>
-                        <h2 class="text-xl font-bold">Jadwal Piket Hari Ini</h2>
-                    </div>
-                    <select id="daySelect" onchange="renderAttendance()" class="bg-black/50 border border-gold-primary/30 text-gold-light p-2 rounded-lg outline-none focus:border-gold-primary transition-all">
-                        <option value="Senin">Senin</option>
-                        <option value="Selasa">Selasa</option>
-                        <option value="Rabu">Rabu</option>
-                        <option value="Kamis">Kamis</option>
-                        <option value="Jum'at">Jum'at</option>
-                        <option value="Sabtu">Sabtu</option>
-                    </select>
+    <!-- MAIN CONTENT -->
+    <main class="main-content flex-1 min-w-0 p-4 lg:p-10 transition-all">
+        
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+            <div>
+                <h2 id="pageTitle" class="text-3xl font-extrabold text-white">SMP NEGERI 4 MONTA</h2>
+                <p id="pageSubtitle" class="text-gray-500 text-sm mt-1">Pantau statistik dan aktivitas kunjungan perpustakaan.</p>
+            </div>
+            <div class="text-right">
+                <p id="currentDate" class="text-xs font-bold text-gray-400 uppercase tracking-widest"></p>
+                <p id="currentTime" class="text-lg font-black gold-text"></p>
+            </div>
+        </header>
+
+        <!-- DASHBOARD TAB -->
+        <div id="section-dashboard" class="tab-content space-y-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                <div class="app-card p-6">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Total Koleksi</p>
+                    <h3 id="statTotalBuku" class="text-3xl font-black mt-1">0</h3>
+                </div>
+                <div class="app-card p-6">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Total Pengunjung</p>
+                    <h3 id="statPengunjung" class="text-3xl font-black mt-1">0</h3>
+                </div>
+                <div class="app-card p-6">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Dipinjam</p>
+                    <h3 id="statBukuDipinjam" class="text-3xl font-black mt-1">0</h3>
+                </div>
+                <div class="app-card p-6">
+                    <p class="text-gray-500 text-[10px] font-bold uppercase tracking-wider">Tersedia</p>
+                    <h3 id="statBukuTersedia" class="text-3xl font-black mt-1">0</h3>
                 </div>
             </div>
 
-            <div id="attendanceCards" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-            <div class="mt-10">
-                <button onclick="submitAttendance()" class="btn-gold w-full py-4 rounded-2xl text-lg uppercase tracking-widest shadow-xl">
-                    Simpan & Log Kehadiran
-                </button>
-            </div>
-        </div>
-
-        <!-- Section: Riwayat -->
-        <div id="section-riwayat" class="tab-content hidden">
-            <div class="vip-card rounded-3xl p-6 overflow-hidden">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                    <h2 class="text-xl font-bold gold-text">Log Kehadiran Member</h2>
-                    <div class="flex gap-2">
-                        <button onclick="confirmClearHistory()" class="text-[10px] border border-red-500 text-red-500 px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all uppercase font-bold">
-                            Hapus Riwayat
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="app-card p-8">
+                    <h4 class="text-lg font-bold mb-8">Buku Tamu Digital</h4>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block tracking-widest">Nama Lengkap Siswa</label>
+                            <input type="text" id="siswaNama" placeholder="Ketik nama lengkap..." class="w-full p-4 rounded-xl text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block tracking-widest">Kelas</label>
+                                <input type="text" id="siswaKelas" placeholder="Misal: 7B" class="w-full p-4 rounded-xl text-sm">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block tracking-widest">Tujuan</label>
+                                <select id="siswaTujuan" class="w-full p-4 rounded-xl text-sm appearance-none">
+                                    <option value="Membaca">Membaca</option>
+                                    <option value="Meminjam">Meminjam</option>
+                                    <option value="Kembali">Kembali</option>
+                                    <option value="Belajar">Belajar</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="addSiswaAttendance()" class="w-full gold-gradient text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest hover:scale-[1.01] transition-all">
+                            Kirim Data Kunjungan
                         </button>
-                        <button onclick="downloadPDF()" class="text-[10px] border border-gold-primary text-gold-primary px-4 py-2 rounded-full hover:bg-gold-primary hover:text-black transition-all uppercase font-bold">
-                            Download PDF Log
-                        </button>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-white/10 text-gray-400">
-                                <th class="pb-4">Tanggal</th>
-                                <th class="pb-4">Hari</th>
-                                <th class="pb-4">Nama</th>
-                                <th class="pb-4">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
 
-        <!-- Section: Kelola -->
-        <div id="section-kelola" class="tab-content hidden">
-            <div class="vip-card rounded-3xl p-6 mb-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <h2 class="text-xl font-bold gold-text">Kelola Data Master</h2>
-                    <button onclick="downloadMasterDataPDF()" class="btn-gold text-[10px] px-4 py-2 rounded-lg shadow-lg">
-                        DOWNLOAD REKAPAN NAMA PIKET
+                <div class="app-card p-8 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-lg font-bold">Aktivitas Hari Ini</h4>
+                        <button onclick="clearSiswaHistory()" class="text-[9px] font-bold uppercase text-red-500 bg-red-500/10 px-3 py-1 rounded-lg hover:bg-red-500/20 transition-all">Hapus Semua</button>
+                    </div>
+                    <div class="overflow-y-auto max-h-[350px]">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-gray-600 border-b border-white/5 uppercase text-[9px] tracking-widest">
+                                    <th class="pb-4">Waktu</th>
+                                    <th class="pb-4">Nama Siswa</th>
+                                    <th class="pb-4">Kelas</th>
+                                    <th class="pb-4">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentSiswaBody" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                    <button onclick="downloadRekapKunjungan()" class="w-full mt-auto pt-6 text-[10px] font-bold text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-file-pdf mr-2"></i>CETAK LAPORAN PDF
                     </button>
                 </div>
-                <div class="flex flex-col md:flex-row gap-3 border-t border-white/5 pt-6">
-                    <input type="text" id="newName" placeholder="Nama Lengkap & Gelar..." class="flex-1 bg-black/40 border border-white/10 p-3 rounded-xl outline-none focus:border-gold-primary transition-all">
-                    <select id="newDay" class="bg-black/40 border border-white/10 p-3 rounded-xl outline-none focus:border-gold-primary transition-all text-gray-300">
-                        <option value="Senin">Senin</option>
-                        <option value="Selasa">Selasa</option>
-                        <option value="Rabu">Rabu</option>
-                        <option value="Kamis">Kamis</option>
-                        <option value="Jum'at">Jum'at</option>
-                        <option value="Sabtu">Sabtu</option>
-                    </select>
-                    <button onclick="addMember()" class="btn-gold px-8 py-3 rounded-xl">TAMBAH</button>
+            </div>
+        </div>
+
+        <!-- PIKET TAB -->
+        <div id="section-absensi" class="tab-content hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="app-card p-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <h4 class="text-lg font-bold">Presensi Petugas</h4>
+                        <select id="daySelect" onchange="renderAttendance()" class="p-2 rounded-lg text-xs font-bold border-gold-primary/20">
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jum'at">Jum'at</option>
+                            <option value="Sabtu">Sabtu</option>
+                        </select>
+                    </div>
+                    <div id="attendanceCards" class="grid gap-3"></div>
+                    <button onclick="submitAttendance()" class="w-full mt-8 gold-gradient text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest transition-all">
+                        Validasi Kehadiran
+                    </button>
+                </div>
+                
+                <div class="app-card p-8 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-lg font-bold">Riwayat Kehadiran</h4>
+                        <button onclick="clearPiketLog()" class="text-[9px] font-bold uppercase text-red-500 bg-red-500/10 px-3 py-1 rounded-lg hover:bg-red-500/20 transition-all">Hapus Semua</button>
+                    </div>
+                    <div class="overflow-y-auto max-h-[400px]">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-gray-600 border-b border-white/5 uppercase text-[9px] tracking-widest">
+                                    <th class="pb-4">Tgl</th>
+                                    <th class="pb-4">Nama</th>
+                                    <th class="pb-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="piketHistoryBody" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                    <button onclick="downloadRekapPiket()" class="w-full mt-auto pt-6 text-[10px] font-bold text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-file-pdf mr-2"></i>CETAK LAPORAN PDF
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <div id="manageList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <!-- KATALOG TAB -->
+        <div id="section-perpus" class="tab-content hidden space-y-8">
+            <div class="app-card p-8">
+                <div class="flex flex-col md:flex-row justify-between gap-6 mb-10">
+                    <div class="relative w-full md:w-96">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="searchBuku" oninput="renderBuku()" placeholder="Cari judul buku..." class="w-full pl-12 pr-4 py-4 rounded-2xl text-sm">
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="downloadRekapKatalog()" class="px-6 py-4 rounded-2xl border border-white/10 text-[10px] font-bold uppercase tracking-widest">Laporan Katalog</button>
+                        <button onclick="switchTab('kelola')" class="gold-gradient px-6 py-4 rounded-2xl text-black text-[10px] font-black uppercase tracking-widest">Tambah Koleksi</button>
+                    </div>
+                </div>
+                <div id="bukuGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- PEMINJAMAN TAB -->
+        <div id="section-transaksi" class="tab-content hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="app-card p-8">
+                    <h4 class="text-lg font-bold mb-8">Form Peminjaman</h4>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Pilih Buku</label>
+                            <select id="pinjamBukuId" onchange="updateMaxQty()" class="w-full p-4 rounded-xl text-sm"></select>
+                            <p id="qtyHint" class="text-[9px] text-gold-primary mt-2 font-bold italic"></p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Jumlah Pinjam</label>
+                                <input type="number" id="pinjamQty" min="1" value="1" class="w-full p-4 rounded-xl text-sm font-bold">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Batas Kembali</label>
+                                <input type="date" id="pinjamDeadline" class="w-full p-4 rounded-xl text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Nama Peminjam</label>
+                            <input type="text" id="pinjamNama" placeholder="Nama siswa..." class="w-full p-4 rounded-xl text-sm">
+                        </div>
+                        <button onclick="prosesPinjam()" class="w-full gold-gradient text-black font-black py-4 rounded-xl text-xs uppercase tracking-widest mt-4">Proses Peminjaman</button>
+                    </div>
+                </div>
+
+                <div class="app-card p-8 flex flex-col">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-lg font-bold">Peminjaman Aktif</h4>
+                        <div class="flex gap-2">
+                            <button onclick="clearPeminjaman()" class="text-[9px] font-bold uppercase text-red-500 bg-red-500/10 px-3 py-1 rounded-lg hover:bg-red-500/20 transition-all">Hapus Semua</button>
+                            <span id="countPinjamLabel" class="text-[10px] font-bold text-gold-primary uppercase flex items-center">Total: 0</span>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto max-h-[450px]">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-gray-600 border-b border-white/5 uppercase text-[9px] tracking-widest">
+                                    <th class="pb-4">Peminjam</th>
+                                    <th class="pb-4">Buku</th>
+                                    <th class="pb-4">Jumlah</th>
+                                    <th class="pb-4">Deadline</th>
+                                    <th class="pb-4 text-right">Opsi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="peminjamanBody" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SISTEM TAB -->
+        <div id="section-kelola" class="tab-content hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="app-card p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 class="text-lg font-bold">Master Petugas Piket</h4>
+                        <button onclick="downloadMasterJadwal()" class="text-[9px] font-bold uppercase text-gold-primary border border-gold-primary/20 px-3 py-1 rounded-lg">
+                            <i class="fas fa-file-pdf mr-1"></i> Jadwal PDF
+                        </button>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                        <input type="text" id="newName" placeholder="Nama Petugas..." class="flex-1 p-3 rounded-xl text-xs">
+                        <select id="newDay" class="p-3 rounded-xl text-xs">
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jum'at">Jum'at</option>
+                            <option value="Sabtu">Sabtu</option>
+                        </select>
+                        <button onclick="addMember()" class="gold-gradient px-6 py-3 rounded-xl text-black text-xs font-black uppercase">Simpan</button>
+                    </div>
+                    <div id="manageList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2"></div>
+                </div>
+
+                <div class="app-card p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h4 id="formBukuTitle" class="text-lg font-bold">Master Data Buku</h4>
+                        <button onclick="clearKatalogBuku()" class="text-[9px] font-bold uppercase text-red-500 bg-red-500/10 px-3 py-1 rounded-lg hover:bg-red-500/20 transition-all">Hapus Katalog</button>
+                    </div>
+                    <input type="hidden" id="editBookId">
+                    <div class="grid gap-5">
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Judul Buku</label>
+                            <input type="text" id="bookTitle" class="w-full p-3 rounded-xl text-xs">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Penulis</label>
+                                <input type="text" id="bookAuthor" class="w-full p-3 rounded-xl text-xs">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Kategori</label>
+                                <select id="bookCategory" class="w-full p-3 rounded-xl text-xs">
+                                    <option value="Buku Pelajaran">Pelajaran</option>
+                                    <option value="Buku Fiksi">Fiksi</option>
+                                    <option value="Buku Non-Fiksi">Non-Fiksi</option>
+                                    <option value="Buku Referensi">Referensi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-gray-500 uppercase font-bold mb-2 block">Stok Total</label>
+                            <input type="number" id="bookStock" class="w-full p-3 rounded-xl text-xs">
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="btnSaveBook" onclick="addBook()" class="flex-1 gold-gradient py-4 rounded-xl text-black text-xs font-black uppercase">Simpan Koleksi</button>
+                            <button id="btnCancelEdit" onclick="cancelEditBook()" class="hidden flex-1 bg-white/5 py-4 rounded-xl text-xs font-bold uppercase">Batal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Alert Modal -->
+    <div id="customAlert" class="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] hidden backdrop-blur-md p-6">
+        <div class="app-card p-10 max-w-sm w-full text-center border-gold-primary shadow-2xl">
+            <div id="alertIcon" class="w-16 h-16 rounded-full gold-gradient flex items-center justify-center text-black text-2xl mx-auto mb-6">
+                <i class="fas fa-check"></i>
+            </div>
+            <p id="alertMessage" class="text-white mb-8 font-semibold text-lg"></p>
+            <button onclick="closeAlert()" class="w-full gold-gradient py-4 rounded-2xl text-black text-xs font-black uppercase tracking-widest">Selesai</button>
         </div>
     </div>
 
-    <!-- Alert Custom -->
-    <div id="customAlert" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
-        <div class="vip-card p-8 rounded-3xl max-w-sm w-full text-center border-gold-primary border">
-            <div id="alertIcon" class="mb-4 text-gold-primary text-4xl">👑</div>
-            <p id="alertMessage" class="text-white mb-6 font-medium"></p>
-            <div id="alertActions" class="flex flex-col gap-2">
-                <button onclick="closeAlert()" class="btn-gold w-full py-3 rounded-xl">OK</button>
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/90 flex items-center justify-center z-[110] hidden backdrop-blur-md p-6">
+        <div class="app-card p-10 max-w-sm w-full text-center border-red-500/50 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 text-2xl mx-auto mb-6">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h4 class="text-white font-bold mb-2">Hapus Data?</h4>
+            <p id="confirmMessage" class="text-gray-400 mb-8 text-sm"></p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirm()" class="flex-1 bg-white/5 py-4 rounded-2xl text-white text-[10px] font-black uppercase">Batal</button>
+                <button id="confirmBtnAction" class="flex-1 bg-red-500 py-4 rounded-2xl text-white text-[10px] font-black uppercase">Hapus</button>
             </div>
         </div>
     </div>
 
     <script>
+        // --- DATA INITIALIZATION ---
         let dataJadwal = JSON.parse(localStorage.getItem('jadwalPerpus')) || {
             "Senin": ["AL AINA UL HADIAH, S.Pd", "MUSLIMAH, S.Pd", "NURLAELAH, S.Pd", "NURUL ARIFAH, S.Pd", "ST. ASFA, S.Pd"],
             "Selasa": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "SA'ADIAH, S.Pd", "JUNARI, S.Pd"],
@@ -184,203 +445,375 @@
             "Sabtu": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "SA'ADIAH, S.Pd", "NURKHALIFAH, S.IP"]
         };
 
-        let riwayat = JSON.parse(localStorage.getItem('riwayatPerpus')) || [];
-        const daysID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jum'at", "Sabtu"];
+        let piketLog = JSON.parse(localStorage.getItem('piketLog')) || [];
+        let daftarBuku = JSON.parse(localStorage.getItem('daftarBuku')) || [];
+        let listPinjam = JSON.parse(localStorage.getItem('listPinjam')) || [];
+        let riwayatSiswa = JSON.parse(localStorage.getItem('riwayatSiswa')) || [];
+        let tempPresence = {};
 
         function init() {
-            const today = new Date();
-            const dayName = daysID[today.getDay()];
-            document.getElementById('daySelect').value = dayName !== "Minggu" ? dayName : "Senin";
-            updateDate();
+            updateTime();
+            setInterval(updateTime, 1000);
+            refreshStats();
             renderAttendance();
-            renderHistory();
+            renderPiketHistory();
+            renderBuku();
+            renderSiswaHistory();
+            renderPeminjaman();
             renderManageList();
+            populatePinjamSelect();
         }
 
-        function updateDate() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('id-ID', options);
+        function updateTime() {
+            const now = new Date();
+            const opt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').innerText = now.toLocaleDateString('id-ID', opt);
+            document.getElementById('currentTime').innerText = now.toLocaleTimeString('id-ID');
         }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active', 'text-gold-primary'));
+            document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
             document.getElementById(`section-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).classList.add('active', 'text-gold-primary');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+
+            const titles = { dashboard: "Dashboard Overview", absensi: "Piket Petugas", perpus: "Katalog Buku", transaksi: "Peminjaman", kelola: "Sistem Admin" };
+            document.getElementById('pageTitle').innerText = titles[tab];
+            if(window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('open');
         }
 
+        function refreshStats() {
+            const total = daftarBuku.reduce((a, b) => a + (parseInt(b.stokAwal) || 0), 0);
+            const cur = daftarBuku.reduce((a, b) => a + (parseInt(b.stokTersedia) || 0), 0);
+            const borrowed = listPinjam.reduce((a, b) => a + (parseInt(b.qty) || 0), 0);
+
+            document.getElementById('statTotalBuku').innerText = total;
+            document.getElementById('statBukuTersedia').innerText = cur;
+            document.getElementById('statBukuDipinjam').innerText = borrowed;
+            document.getElementById('statPengunjung').innerText = riwayatSiswa.length;
+            document.getElementById('countPinjamLabel').innerText = "Total: " + listPinjam.length;
+        }
+
+        // --- ATTENDANCE ---
         function renderAttendance() {
-            const selectedDay = document.getElementById('daySelect').value;
-            const names = dataJadwal[selectedDay];
-            const container = document.getElementById('attendanceCards');
-            container.innerHTML = '';
-            names.forEach((name, index) => {
-                const card = document.createElement('div');
-                card.className = "vip-card p-5 rounded-2xl flex flex-col gap-4";
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-gold-dark to-gold-light flex items-center justify-center text-black font-bold text-xs">${index + 1}</div>
-                        <h3 class="font-semibold text-white tracking-wide">${name}</h3>
-                    </div>
+            const day = document.getElementById('daySelect').value;
+            const names = dataJadwal[day] || [];
+            document.getElementById('attendanceCards').innerHTML = names.map(n => `
+                <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <span class="text-xs font-bold">${n}</span>
                     <div class="flex gap-2">
-                        ${['Hadir', 'Izin', 'Alpa'].map(status => `
-                            <label class="flex-1 cursor-pointer">
-                                <input type="radio" name="piket-${index}" value="${status}" class="hidden peer">
-                                <div class="text-[10px] text-center py-2 rounded-lg border border-white/5 bg-white/5 peer-checked:bg-gold-primary peer-checked:text-black peer-checked:border-gold-primary transition-all uppercase font-bold tracking-widest text-gray-400">${status}</div>
+                        ${['H', 'I', 'A'].map(s => `
+                            <label class="cursor-pointer">
+                                <input type="radio" name="p-${n}" value="${s}" class="hidden peer" onchange="tempPresence['${n}'] = '${s}'">
+                                <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 text-[9px] font-bold border border-white/5 peer-checked:bg-gold-primary peer-checked:text-black transition-all">${s}</div>
                             </label>
                         `).join('')}
                     </div>
-                `;
-                container.appendChild(card);
-            });
+                </div>
+            `).join('');
         }
 
         function submitAttendance() {
-            const selectedDay = document.getElementById('daySelect').value;
-            const names = dataJadwal[selectedDay];
-            const date = new Date().toLocaleDateString('id-ID');
-            let completed = true;
-            const sessionRecords = [];
-            names.forEach((name, index) => {
-                const checked = document.querySelector(`input[name="piket-${index}"]:checked`);
-                if (!checked) completed = false;
-                else sessionRecords.push({ tanggal: date, hari: selectedDay, nama: name, status: checked.value });
-            });
-            if (!completed) return showAlert("👑 Selesaikan semua absen untuk status VIP.");
-            riwayat = [...sessionRecords, ...riwayat];
-            localStorage.setItem('riwayatPerpus', JSON.stringify(riwayat));
-            renderHistory();
-            showAlert("👑 Absensi Berhasil Disimpan.");
-        }
-
-        function renderHistory() {
-            const tbody = document.getElementById('historyTableBody');
-            tbody.innerHTML = '';
-            riwayat.forEach(item => {
-                const row = document.createElement('tr');
-                row.className = "border-b border-white/5 text-xs";
-                const color = item.status === 'Hadir' ? 'text-green-400' : (item.status === 'Izin' ? 'text-yellow-400' : 'text-red-400');
-                row.innerHTML = `<td class="py-3 text-gray-500">${item.tanggal}</td><td class="py-3">${item.hari}</td><td class="py-3 text-white">${item.nama}</td><td class="py-3 font-bold ${color}">${item.status.toUpperCase()}</td>`;
-                tbody.appendChild(row);
-            });
-        }
-
-        function confirmClearHistory() {
-            if (riwayat.length === 0) return showAlert("⚠️ Tidak ada riwayat untuk dihapus.");
-            
-            const msg = "Apakah Anda yakin ingin menghapus SEMUA riwayat absensi? Tindakan ini tidak dapat dibatalkan.";
-            document.getElementById('alertMessage').innerText = msg;
-            document.getElementById('alertActions').innerHTML = `
-                <button onclick="clearHistory()" class="bg-red-500 text-white w-full py-3 rounded-xl font-bold mb-2">YA, HAPUS SEMUA</button>
-                <button onclick="closeAlert()" class="bg-white/10 text-white w-full py-3 rounded-xl">BATAL</button>
-            `;
-            document.getElementById('customAlert').classList.remove('hidden');
-        }
-
-        function clearHistory() {
-            riwayat = [];
-            localStorage.setItem('riwayatPerpus', JSON.stringify(riwayat));
-            renderHistory();
-            closeAlert();
-            showAlert("✅ Riwayat telah dibersihkan.");
-            // Reset actions to default
-            setTimeout(() => {
-                document.getElementById('alertActions').innerHTML = `<button onclick="closeAlert()" class="btn-gold w-full py-3 rounded-xl">OK</button>`;
-            }, 300);
-        }
-
-        async function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("Laporan Kehadiran VIP", 14, 20);
-            doc.autoTable({ head: [['Tanggal', 'Hari', 'Nama', 'Status']], body: riwayat.map(i => [i.tanggal, i.hari, i.nama, i.status]), startY: 25 });
-            doc.save(`Laporan_Absensi.pdf`);
-        }
-
-        async function downloadMasterDataPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFillColor(26, 26, 26);
-            doc.rect(0, 0, 210, 40, 'F');
-            doc.setTextColor(212, 175, 55);
-            doc.setFontSize(18);
-            doc.text("JADWAL PIKET PERPUSTAKAAN", 105, 18, { align: "center" });
-            doc.setFontSize(12);
-            doc.text("SMPN 4 MONTA - TAHUN AJARAN 2025/2026", 105, 28, { align: "center" });
-
-            let tableData = [];
-            const maxRows = Math.max(...Object.values(dataJadwal).map(arr => arr.length));
-            for (let i = 0; i < maxRows; i++) {
-                tableData.push([
-                    dataJadwal["Senin"][i] || "-",
-                    dataJadwal["Selasa"][i] || "-",
-                    dataJadwal["Rabu"][i] || "-",
-                    dataJadwal["Kamis"][i] || "-",
-                    dataJadwal["Jum'at"][i] || "-",
-                    dataJadwal["Sabtu"][i] || "-"
-                ]);
+            const day = document.getElementById('daySelect').value;
+            const today = new Date().toLocaleDateString('id-ID');
+            let entries = 0;
+            for(let name in tempPresence) {
+                piketLog.unshift({ id: Date.now() + Math.random(), tgl: today, hari: day, nama: name, status: tempPresence[name] });
+                entries++;
+                delete tempPresence[name];
             }
-
-            doc.autoTable({
-                head: [['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUM\'AT', 'SABTU']],
-                body: tableData,
-                startY: 50,
-                theme: 'grid',
-                headStyles: { fillColor: [212, 175, 55], textColor: [0, 0, 0], fontSize: 9, halign: 'center', fontStyle: 'bold' },
-                styles: { fontSize: 8, cellPadding: 3, textColor: [40, 40, 40] }
-            });
-            doc.save("Rekapan_Nama_Piket_Perpus.pdf");
+            if(entries === 0) return showAlert("⚠️ Pilih status petugas!");
+            localStorage.setItem('piketLog', JSON.stringify(piketLog));
+            renderPiketHistory(); renderAttendance(); showAlert("✅ Absensi Berhasil!");
         }
 
-        function renderManageList() {
-            const container = document.getElementById('manageList');
-            container.innerHTML = '';
-            Object.keys(dataJadwal).forEach(day => {
-                const div = document.createElement('div');
-                div.className = "vip-card p-4 rounded-2xl";
-                div.innerHTML = `
-                    <h3 class="gold-text font-bold mb-3 border-b border-white/5 pb-2 uppercase text-xs tracking-widest">${day}</h3>
-                    <div class="space-y-1">
-                        ${dataJadwal[day].map((name, i) => `
-                            <div class="flex justify-between items-center text-[11px] bg-white/5 p-2 rounded-lg">
-                                <span class="truncate pr-2">${name}</span>
-                                <button onclick="removeMember('${day}', ${i})" class="text-red-500 font-bold">✕</button>
-                            </div>
-                        `).join('')}
+        function renderPiketHistory() {
+            document.getElementById('piketHistoryBody').innerHTML = piketLog.map(l => `
+                <tr>
+                    <td class="py-4 text-gray-500 text-[10px]">${l.tgl}<br><span class="text-gold-primary font-bold uppercase">${l.hari}</span></td>
+                    <td class="py-4 font-bold text-white text-[11px]">${l.nama}</td>
+                    <td class="py-4">
+                        <span class="px-2 py-1 rounded text-[9px] font-black ${l.status==='H'?'bg-green-500/10 text-green-500':'bg-red-500/10 text-red-500'}">
+                            ${l.status==='H'?'HADIR':(l.status==='I'?'IZIN':'ALFA')}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- GUEST BOOK ---
+        function addSiswaAttendance() {
+            const n = document.getElementById('siswaNama').value;
+            const k = document.getElementById('siswaKelas').value;
+            const t = document.getElementById('siswaTujuan').value;
+            if(!n || !k) return showAlert("⚠️ Nama & Kelas wajib diisi.");
+            riwayatSiswa.unshift({ id: Date.now(), n, k, t, w: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+            localStorage.setItem('riwayatSiswa', JSON.stringify(riwayatSiswa));
+            document.getElementById('siswaNama').value = '';
+            document.getElementById('siswaKelas').value = '';
+            renderSiswaHistory(); refreshStats(); showAlert("✨ Berhasil Terkirim!");
+        }
+
+        function renderSiswaHistory() {
+            document.getElementById('recentSiswaBody').innerHTML = riwayatSiswa.map(s => `
+                <tr>
+                    <td class="py-4 text-[10px] text-gray-500">${s.w}</td>
+                    <td class="py-4 text-xs font-bold text-white">${s.n}</td>
+                    <td class="py-4 text-xs text-gold-light">${s.k}</td>
+                    <td class="py-4 text-[9px]"><span class="bg-white/5 px-2 py-1 rounded uppercase font-bold text-gray-400">${s.t}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- CATALOG ---
+        function renderBuku() {
+            const q = document.getElementById('searchBuku').value.toLowerCase();
+            document.getElementById('bukuGrid').innerHTML = daftarBuku.filter(b => b.judul.toLowerCase().includes(q)).map(b => `
+                <div class="app-card p-6 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="text-[9px] font-bold px-2 py-1 bg-white/5 text-gray-500 rounded uppercase tracking-widest">${b.kategori}</span>
+                            <span class="text-[10px] font-bold ${b.stokTersedia<=0?'text-red-500':'text-green-500'}">
+                                ${b.stokTersedia<=0?'HABIS':'STOK: '+b.stokTersedia}
+                            </span>
+                        </div>
+                        <h5 class="text-sm font-bold text-white mb-1 line-clamp-2">${b.judul}</h5>
+                        <p class="text-[11px] text-gray-500 italic">${b.penulis}</p>
                     </div>
-                `;
-                container.appendChild(div);
+                    <div class="mt-6 pt-4 border-t border-white/5 flex justify-between">
+                        <button onclick="editBook(${b.id})" class="text-[10px] font-black text-gold-primary uppercase hover:text-white">Ubah</button>
+                        <button onclick="deleteSingleBook(${b.id})" class="text-[10px] font-black text-red-500/50 uppercase hover:text-red-500">Hapus</button>
+                    </div>
+                </div>
+            `).join('');
+            populatePinjamSelect();
+        }
+
+        function addBook() {
+            const idInput = document.getElementById('editBookId').value;
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const stock = parseInt(document.getElementById('bookStock').value);
+            const cat = document.getElementById('bookCategory').value;
+            
+            if(!title || isNaN(stock)) return showAlert("⚠️ Lengkapi data buku!");
+
+            if(idInput) {
+                const b = daftarBuku.find(x => x.id == idInput);
+                const diff = stock - b.stokAwal;
+                b.judul = title; b.penulis = author; b.kategori = cat; b.stokAwal = stock;
+                b.stokTersedia = Math.max(0, b.stokTersedia + diff);
+                cancelEditBook();
+            } else {
+                daftarBuku.unshift({ id: Date.now(), judul: title, penulis: author, kategori: cat, stokAwal: stock, stokTersedia: stock });
+            }
+            localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
+            renderBuku(); refreshStats(); showAlert("✅ Koleksi Berhasil Disimpan!");
+            document.getElementById('bookTitle').value = ''; document.getElementById('bookAuthor').value = '';
+        }
+
+        function editBook(id) {
+            const b = daftarBuku.find(x => x.id == id);
+            switchTab('kelola');
+            document.getElementById('editBookId').value = b.id;
+            document.getElementById('bookTitle').value = b.judul;
+            document.getElementById('bookAuthor').value = b.penulis;
+            document.getElementById('bookStock').value = b.stokAwal;
+            document.getElementById('bookCategory').value = b.kategori;
+            document.getElementById('btnSaveBook').innerText = "Update Buku";
+            document.getElementById('btnCancelEdit').classList.remove('hidden');
+        }
+
+        function cancelEditBook() {
+            document.getElementById('editBookId').value = '';
+            document.getElementById('btnSaveBook').innerText = "Simpan Koleksi";
+            document.getElementById('btnCancelEdit').classList.add('hidden');
+            document.getElementById('bookTitle').value = ''; document.getElementById('bookAuthor').value = '';
+        }
+
+        function deleteSingleBook(id) {
+            showConfirm("Hapus buku ini dari sistem?", () => {
+                daftarBuku = daftarBuku.filter(x => x.id !== id);
+                localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
+                renderBuku(); refreshStats();
             });
+        }
+
+        // --- TRANSACTIONS ---
+        function populatePinjamSelect() {
+            const s = document.getElementById('pinjamBukuId'); if(!s) return;
+            s.innerHTML = '<option value="">Cari Buku...</option>' + 
+                daftarBuku.filter(b => b.stokTersedia > 0).map(b => `<option value="${b.id}">${b.judul}</option>`).join('');
+        }
+
+        function updateMaxQty() {
+            const b = daftarBuku.find(x => x.id == document.getElementById('pinjamBukuId').value);
+            document.getElementById('qtyHint').innerText = b ? `Stok Tersedia: ${b.stokTersedia}` : "";
+        }
+
+        function prosesPinjam() {
+            const id = document.getElementById('pinjamBukuId').value;
+            const qty = parseInt(document.getElementById('pinjamQty').value);
+            const nama = document.getElementById('pinjamNama').value;
+            const dl = document.getElementById('pinjamDeadline').value;
+            
+            if(!id || !nama || !dl || isNaN(qty)) return showAlert("⚠️ Lengkapi data!");
+            const b = daftarBuku.find(x => x.id == id);
+            if(qty > b.stokTersedia) return showAlert("⚠️ Stok tidak mencukupi!");
+
+            b.stokTersedia -= qty;
+            listPinjam.push({ id: Date.now(), bukuId: id, judul: b.judul, qty, peminjam: nama, deadline: dl });
+            localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
+            localStorage.setItem('listPinjam', JSON.stringify(listPinjam));
+            renderPeminjaman(); renderBuku(); refreshStats(); showAlert("✅ Pinjam Berhasil!");
+            document.getElementById('pinjamNama').value = '';
+        }
+
+        function renderPeminjaman() {
+            document.getElementById('peminjamanBody').innerHTML = listPinjam.map((p, i) => `
+                <tr>
+                    <td class="py-4 font-bold text-white text-[11px]">${p.peminjam}</td>
+                    <td class="py-4 text-gray-500 text-[10px] line-clamp-1">${p.judul}</td>
+                    <td class="py-4 text-gold-primary font-black text-center text-xs">${p.qty}</td>
+                    <td class="py-4 text-red-400 font-bold text-[10px]">${p.deadline}</td>
+                    <td class="py-4 text-right">
+                        <button onclick="kembali(${i})" class="text-[9px] font-bold text-green-500 border border-green-500/20 px-2 py-1 rounded hover:bg-green-500/10">KEMBALI</button>
+                    </td>
+                </tr>
+            `).join('');
+            refreshStats();
+        }
+
+        function kembali(idx) {
+            const p = listPinjam[idx];
+            const b = daftarBuku.find(x => x.id == p.bukuId);
+            if(b) b.stokTersedia += p.qty;
+            listPinjam.splice(idx, 1);
+            localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
+            localStorage.setItem('listPinjam', JSON.stringify(listPinjam));
+            renderPeminjaman(); renderBuku(); refreshStats();
+        }
+
+        // --- GLOBAL DELETE (IMPROVED) ---
+        function clearSiswaHistory() {
+            showConfirm("Bersihkan riwayat kunjungan hari ini?", () => {
+                riwayatSiswa = [];
+                localStorage.setItem('riwayatSiswa', JSON.stringify([]));
+                renderSiswaHistory(); refreshStats();
+                showAlert("✅ Riwayat Berhasil Dihapus!");
+            });
+        }
+
+        function clearPiketLog() {
+            showConfirm("Bersihkan seluruh log presensi petugas?", () => {
+                piketLog = [];
+                localStorage.setItem('piketLog', JSON.stringify([]));
+                renderPiketHistory();
+                showAlert("✅ Log Presensi Dihapus!");
+            });
+        }
+
+        function clearPeminjaman() {
+            showConfirm("Hapus SEMUA data peminjaman? (Buku akan dianggap kembali ke stok)", () => {
+                // Kembalikan semua stok sebelum menghapus
+                listPinjam.forEach(p => {
+                    const b = daftarBuku.find(x => x.id == p.bukuId);
+                    if(b) b.stokTersedia += p.qty;
+                });
+                listPinjam = [];
+                localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
+                localStorage.setItem('listPinjam', JSON.stringify([]));
+                renderPeminjaman(); renderBuku(); refreshStats();
+                showAlert("✅ Data Peminjaman Bersih!");
+            });
+        }
+
+        function clearKatalogBuku() {
+            showConfirm("Format ulang seluruh katalog buku?", () => {
+                daftarBuku = [];
+                listPinjam = []; // Juga hapus pinjam karena referensi buku hilang
+                localStorage.setItem('daftarBuku', JSON.stringify([]));
+                localStorage.setItem('listPinjam', JSON.stringify([]));
+                renderBuku(); renderPeminjaman(); refreshStats();
+                showAlert("✅ Katalog Berhasil Dikosongkan!");
+            });
+        }
+
+        // --- MANAGE PIKET ---
+        function renderManageList() {
+            document.getElementById('manageList').innerHTML = Object.keys(dataJadwal).map(day => `
+                <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <h6 class="text-[9px] font-black text-gold-primary uppercase mb-3">${day}</h6>
+                    ${dataJadwal[day].map((n, i) => `
+                        <div class="flex justify-between items-center text-[10px] mb-1">
+                            <span class="text-gray-300">${n}</span>
+                            <button onclick="removeMember('${day}', ${i})" class="text-red-500/30 hover:text-red-500"><i class="fas fa-times"></i></button>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
         }
 
         function addMember() {
-            const name = document.getElementById('newName').value;
-            const day = document.getElementById('newDay').value;
-            if (!name) return;
-            dataJadwal[day].push(name);
+            const n = document.getElementById('newName').value;
+            const d = document.getElementById('newDay').value;
+            if(!n) return;
+            dataJadwal[d].push(n);
             localStorage.setItem('jadwalPerpus', JSON.stringify(dataJadwal));
             document.getElementById('newName').value = '';
-            renderManageList();
-            renderAttendance();
-            showAlert(`👑 ${name} ditambahkan ke hari ${day}`);
+            renderManageList(); renderAttendance();
         }
 
-        function removeMember(day, i) {
-            if(confirm('Hapus anggota ini?')) {
-                dataJadwal[day].splice(i, 1);
-                localStorage.setItem('jadwalPerpus', JSON.stringify(dataJadwal));
-                renderManageList();
-                renderAttendance();
-            }
+        function removeMember(d, i) {
+            dataJadwal[d].splice(i, 1);
+            localStorage.setItem('jadwalPerpus', JSON.stringify(dataJadwal));
+            renderManageList(); renderAttendance();
         }
 
+        // --- HELPERS ---
         function showAlert(msg) {
             document.getElementById('alertMessage').innerText = msg;
-            document.getElementById('alertActions').innerHTML = `<button onclick="closeAlert()" class="btn-gold w-full py-3 rounded-xl">OK</button>`;
             document.getElementById('customAlert').classList.remove('hidden');
         }
-
         function closeAlert() { document.getElementById('customAlert').classList.add('hidden'); }
+        function showConfirm(msg, callback) {
+            document.getElementById('confirmMessage').innerText = msg;
+            document.getElementById('confirmModal').classList.remove('hidden');
+            document.getElementById('confirmBtnAction').onclick = () => { callback(); closeConfirm(); };
+        }
+        function closeConfirm() { document.getElementById('confirmModal').classList.add('hidden'); }
+
+        // --- PDF EXPORTS ---
+        function downloadRekapKunjungan() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("LAPORAN KUNJUNGAN PERPUSTAKAAN", 10, 10);
+            doc.autoTable({ head:[['Waktu','Nama','Kelas','Tujuan']], body:riwayatSiswa.map(s=>[s.w,s.n,s.k,s.t]) });
+            doc.save("Laporan_Kunjungan.pdf");
+        }
+        function downloadRekapPiket() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("LAPORAN PRESENSI PETUGAS", 10, 10);
+            doc.autoTable({ head:[['Tgl','Nama','Status']], body:piketLog.map(l=>[l.tgl,l.nama,l.status]) });
+            doc.save("Laporan_Piket.pdf");
+        }
+        function downloadRekapKatalog() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("DAFTAR KATALOG KOLEKSI BUKU", 10, 10);
+            doc.autoTable({ head:[['Judul','Penulis','Kategori','Stok']], body:daftarBuku.map(b=>[b.judul,b.penulis,b.kategori,b.stokTersedia]) });
+            doc.save("Katalog_Buku.pdf");
+        }
+        function downloadMasterJadwal() {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.text("JADWAL PIKET PETUGAS PERPUSTAKAAN", 10, 10);
+            let rows = [];
+            ["Senin","Selasa","Rabu","Kamis","Jum'at","Sabtu"].forEach(d => {
+                dataJadwal[d].forEach(n => rows.push([d, n]));
+            });
+            doc.autoTable({ head:[['Hari','Nama Petugas']], body:rows });
+            doc.save("Master_Jadwal.pdf");
+        }
 
         window.onload = init;
     </script>
