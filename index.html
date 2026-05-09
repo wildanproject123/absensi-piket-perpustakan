@@ -330,8 +330,8 @@
                                 <tr class="text-gray-600 border-b border-white/5 uppercase text-[9px] tracking-widest">
                                     <th class="pb-4">Peminjam</th>
                                     <th class="pb-4">Buku</th>
-                                    <th class="pb-4">Jumlah</th>
-                                    <th class="pb-4">Deadline</th>
+                                    <th class="pb-4 text-center">Qty</th>
+                                    <th class="pb-4 text-center">Ket</th>
                                     <th class="pb-4 text-right">Opsi</th>
                                 </tr>
                             </thead>
@@ -435,13 +435,11 @@
 
     <script>
         // --- GOOGLE SHEET INTEGRATION CONFIG ---
-        const scriptURL = "https://script.google.com/macros/s/AKfycbwD11Hnx75I2PpE0tFixyIEwghMHNZlvy2uMcKuTN15mFvOQpxI4SdeL9Zm7_OiqMZLwQ/exec"; 
+        const scriptURL = "https://script.google.com/macros/s/AKfycbw7PL2gsRrIX8Q6FDVNHYblGQZY-9eXi7DsJHIYk5IBG4I3u9dO6FRlf4Y1R8rpMIa1/exec"; 
 
         async function sendToGoogleSheet(sheetName, data) {
             if (!scriptURL) return;
             try {
-                // Menggunakan fetch POST dengan mode no-cors untuk menghindari error CORS browser
-                // Parameter sheet dikirim lewat URL query, data dikirim lewat body
                 await fetch(`${scriptURL}?sheet=${sheetName}`, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -458,11 +456,11 @@
         // --- DATA INITIALIZATION ---
         let dataJadwal = JSON.parse(localStorage.getItem('jadwalPerpus')) || {
             "Senin": ["AL AINA UL HADIAH, S.Pd", "MUSLIMAH, S.Pd", "NURLAELAH, S.Pd", "NURUL ARIFAH, S.Pd", "ST. ASFA, S.Pd"],
-            "Selasa": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "JUNARI, S.Pd"],
+            "Selasa": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "SA'ADIAH, S.Pd", "JUNARI, S.Pd"],
             "Rabu": ["AL AINA UL HADIAH, S.Pd", "MUSLIMAH, S.Pd", "NURLAELAH, S.Pd", "NURUL ARIFAH, S.Pd", "SARINA, S.Pd"],
-            "Kamis": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "YULIANA ANDINI, SE"],
-            "Jum'at": ["WILDAN MUKHALADUN, S.Pd"],
-            "Sabtu": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "NURKHALIFAH, S.IP"]
+            "Kamis": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "SA'ADIAH, S.Pd", "YULIANA ANDINI, SE"],
+            "Jum'at": ["AL AINA UL HADIAH, S.Pd", "MUSLIMAH, S.Pd", "NURLAELAH, S.Pd", "NURUL ARIFAH, S.Pd"],
+            "Sabtu": ["MUKMINAH, S.Pd", "NURHASANAH, S.Pd", "NURRAHMI, S.Pd", "SA'ADIAH, S.Pd", "NURKHALIFAH, S.IP"]
         };
 
         let piketLog = JSON.parse(localStorage.getItem('piketLog')) || [];
@@ -507,7 +505,7 @@
         function refreshStats() {
             const total = daftarBuku.reduce((a, b) => a + (parseInt(b.stokAwal) || 0), 0);
             const cur = daftarBuku.reduce((a, b) => a + (parseInt(b.stokTersedia) || 0), 0);
-            const borrowed = listPinjam.reduce((a, b) => a + (parseInt(b.qty) || 0), 0);
+            const borrowed = listPinjam.filter(p => p.ket !== "SUDAH DIKEMBALIKAN").reduce((a, b) => a + (parseInt(b.qty) || 0), 0);
 
             document.getElementById('statTotalBuku').innerText = total;
             document.getElementById('statBukuTersedia').innerText = cur;
@@ -617,7 +615,7 @@
                 daftarBuku[idx] = { ...old, judul: title, penulis: author, kategori: category, stokAwal: stock, stokTersedia: stock - (old.stokAwal - old.stokTersedia) };
                 cancelEditBook();
             } else {
-                const newBook = { id: Date.now(), judul: title, penulis: author, kategori: category, stokAwal: stock, stokTersedia: stock };
+                const newBook = { id: Date.now().toString(), judul: title, penulis: author, kategori: category, stokAwal: stock, stokTersedia: stock };
                 daftarBuku.push(newBook);
                 sendToGoogleSheet('Data_Buku', newBook);
             }
@@ -636,8 +634,8 @@
                     <div class="flex justify-between items-start mb-4">
                         <span class="px-2 py-1 bg-gold-primary/10 text-gold-primary text-[8px] font-black uppercase rounded">${b.kategori}</span>
                         <div class="flex gap-2">
-                             <button onclick="editBook(${b.id})" class="text-gray-500 hover:text-white"><i class="fas fa-edit"></i></button>
-                             <button onclick="deleteBook(${b.id})" class="text-gray-500 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                             <button onclick="editBook('${b.id}')" class="text-gray-500 hover:text-white"><i class="fas fa-edit"></i></button>
+                             <button onclick="deleteBook('${b.id}')" class="text-gray-500 hover:text-red-500"><i class="fas fa-trash"></i></button>
                         </div>
                     </div>
                     <h5 class="font-bold text-white mb-1 leading-tight">${b.judul}</h5>
@@ -678,7 +676,18 @@
             if(qty > buku.stokTersedia) return showAlert("⚠️ Stok tidak cukup!");
 
             buku.stokTersedia -= qty;
-            const entry = { id: Date.now(), bukuId: bId, judul: buku.judul, nama, qty, deadline, tgl: new Date().toLocaleDateString('id-ID') };
+            const entryId = "ID-" + Date.now();
+            const entry = { 
+                id: entryId, 
+                bukuId: bId, 
+                judul: buku.judul, 
+                nama: nama, 
+                qty: qty, 
+                deadline: deadline, 
+                tgl: new Date().toLocaleDateString('id-ID'),
+                ket: "BELUM KEMBALI"
+            };
+            
             listPinjam.push(entry);
             sendToGoogleSheet('Peminjaman_Buku', entry);
 
@@ -692,29 +701,62 @@
 
         function renderPeminjaman() {
             document.getElementById('peminjamanBody').innerHTML = listPinjam.map(p => `
-                <tr>
+                <tr class="${p.ket === 'SUDAH DIKEMBALIKAN' ? 'opacity-50' : ''}">
                     <td class="py-4"><p class="text-xs font-bold text-white">${p.nama}</p></td>
                     <td class="py-4"><p class="text-[10px] text-gray-400">${p.judul}</p></td>
                     <td class="py-4 text-center"><span class="text-xs font-bold">${p.qty}</span></td>
-                    <td class="py-4"><span class="text-[10px] font-bold text-gold-primary">${p.deadline}</span></td>
+                    <td class="py-4 text-center">
+                        <span class="px-2 py-1 rounded text-[8px] font-black ${p.ket === 'SUDAH DIKEMBALIKAN' ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}">
+                            ${p.ket}
+                        </span>
+                    </td>
                     <td class="py-4 text-right">
-                        <button onclick="kembalikanBuku(${p.id})" class="bg-gold-primary/10 text-gold-primary text-[8px] font-bold px-3 py-2 rounded-lg hover:bg-gold-primary hover:text-black transition-all">KEMBALIKAN</button>
+                        ${p.ket === 'BELUM KEMBALI' ? 
+                            `<button onclick="kembalikanBuku('${p.id}')" class="bg-gold-primary/10 text-gold-primary text-[8px] font-bold px-3 py-2 rounded-lg hover:bg-gold-primary hover:text-black transition-all">KEMBALIKAN</button>` : 
+                            `<i class="fas fa-check-circle text-green-500"></i>`
+                        }
                     </td>
                 </tr>
             `).join('');
         }
 
-        function kembalikanBuku(id) {
-            const p = listPinjam.find(x => x.id == id);
-            const buku = daftarBuku.find(b => b.id == p.bukuId);
-            if(buku) buku.stokTersedia += p.qty;
+        async function kembalikanBuku(id) {
+            const idx = listPinjam.findIndex(x => x.id === id);
+            if(idx === -1) return;
+
+            const p = listPinjam[idx];
+            const buku = daftarBuku.find(b => b.id === p.bukuId);
             
-            listPinjam = listPinjam.filter(x => x.id != id);
-            localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
-            localStorage.setItem('listPinjam', JSON.stringify(listPinjam));
-            
-            renderBuku(); renderPeminjaman(); populatePinjamSelect(); refreshStats();
-            showAlert("✅ Buku telah dikembalikan");
+            // Logika Update ke Google Sheets
+            const updatePayload = {
+                id: id,
+                action: 'update_status',
+                ket: 'SUDAH DIKEMBALIKAN'
+            };
+
+            showAlert("⏳ Sinkronisasi status ke Cloud...");
+
+            try {
+                // Kirim permintaan update ke Google Sheets
+                await fetch(`${scriptURL}?sheet=Peminjaman_Buku`, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(updatePayload)
+                });
+
+                // Update lokal setelah berhasil cloud (no-cors tidak bisa baca response, tapi kita asumsikan kirim)
+                if(buku) buku.stokTersedia += p.qty;
+                listPinjam[idx].ket = "SUDAH DIKEMBALIKAN";
+
+                localStorage.setItem('daftarBuku', JSON.stringify(daftarBuku));
+                localStorage.setItem('listPinjam', JSON.stringify(listPinjam));
+                
+                renderBuku(); renderPeminjaman(); populatePinjamSelect(); refreshStats();
+                showAlert("✅ Status Berhasil Diperbarui!");
+            } catch (e) {
+                console.error(e);
+                showAlert("❌ Gagal sinkronisasi. Coba lagi.");
+            }
         }
 
         // --- MANAGEMENT (SISTEM) ---
