@@ -107,6 +107,77 @@
             border-bottom-left-radius: 4px;
         }
     </style>
+
+    <!-- KODE DETEKSI LOGO DI LETAKKAN DI HEAD AGAR TIDAK MENGHASILKAN REFERENCE ERROR -->
+    <script>
+        function showSvgLogo(imgElement, position) {
+            const isSidebar = position === 'sidebar';
+            const sizeClass = isSidebar ? 'w-20 h-20' : 'w-12 h-12';
+            const shadowClass = isSidebar ? 'drop-shadow-[0_4px_10px_rgba(212,175,55,0.35)]' : 'drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]';
+            
+            const svgHtml = `
+            <svg viewBox="0 0 200 200" class="${sizeClass} ${shadowClass}" xmlns="http://www.w3.org/2000/svg">
+                <!-- Outer Gold Rim -->
+                <circle cx="100" cy="100" r="96" fill="#0d1b2e" stroke="#D4AF37" stroke-width="4.5" />
+                <circle cx="100" cy="100" r="89" fill="none" stroke="#F9E498" stroke-width="1.5" />
+                
+                <!-- Inner Gold Rim -->
+                <circle cx="100" cy="100" r="66" fill="#081220" stroke="#D4AF37" stroke-width="3" />
+                
+                <!-- Paths for Circular Text -->
+                <path id="textPathTop" d="M 28,100 A 72,72 0 0,1 172,100" fill="none" />
+                <path id="textPathBottom" d="M 172,100 A 72,72 0 0,1 28,100" fill="none" />
+                
+                <!-- Circular Text -->
+                <text font-family="'Plus Jakarta Sans', sans-serif">
+                    <textPath href="#textPathTop" startOffset="50%" text-anchor="middle" fill="#F9E498" font-size="13" font-weight="900" letter-spacing="3.2">PERPUSTAKAAN</textPath>
+                </text>
+                <text font-family="'Plus Jakarta Sans', sans-serif">
+                    <textPath href="#textPathBottom" startOffset="50%" text-anchor="middle" fill="#F9E498" font-size="11.5" font-weight="900" letter-spacing="1.5">SMP NEGERI 4 MONTA</textPath>
+                </text>
+                
+                <!-- Gold Stars under "PERPUSTAKAAN" -->
+                <g fill="#D4AF37">
+                    <polygon points="100,44 102,48 107,48 103,51 105,56 100,53 95,56 97,51 93,48 98,48" />
+                    <polygon points="85,46 87,50 92,50 88,53 90,58 85,55 80,58 82,53 78,50 83,50" />
+                    <polygon points="115,46 117,50 122,50 118,53 120,58 115,55 110,58 112,53 108,50 113,50" />
+                    <polygon points="71,51 73,55 78,55 74,58 76,63 71,60 66,63 68,58 64,55 69,55" />
+                    <polygon points="129,51 131,55 136,55 132,58 134,63 129,60 124,63 126,58 122,55 127,55" />
+                </g>
+                
+                <!-- Laurel Leaves on the Sides -->
+                <path d="M 40,95 Q 35,100 40,105 Q 45,100 40,95 Z" fill="#D4AF37" />
+                <path d="M 160,95 Q 155,100 160,105 Q 165,100 160,95 Z" fill="#D4AF37" />
+                
+                <!-- Center Graphics -->
+                <!-- Gold Book -->
+                <path d="M 75,135 Q 100,128 100,135 Q 100,128 125,135 L 125,115 Q 100,108 100,115 Q 100,108 75,115 Z" fill="#F9E498" stroke="#996515" stroke-width="1" />
+                <path d="M 100,115 L 100,135" stroke="#996515" stroke-width="1.5" />
+                
+                <!-- Traditional House NTB Silhouette -->
+                <path d="M 112,110 L 128,110 L 128,102 L 120,95 L 112,102 Z" fill="#D4AF37" opacity="0.85" />
+                <rect x="117" y="104" width="6" height="6" fill="#081220" />
+                
+                <!-- Indonesian Flag -->
+                <rect x="114" y="82" width="14" height="4.5" fill="#FF0000" />
+                <rect x="114" y="86.5" width="14" height="4.5" fill="#FFFFFF" />
+                <line x1="114" y1="82" x2="114" y2="95" stroke="#D4AF37" stroke-width="1.8" />
+                
+                <!-- Central Torch -->
+                <path d="M 97,125 L 103,125 L 101,95 L 99,95 Z" fill="#D4AF37" />
+                <ellipse cx="100" cy="94" rx="5" ry="3" fill="#996515" />
+                <!-- Flame -->
+                <path d="M 100,72 C 95,83 105,85 100,92 C 105,85 103,78 100,72 Z" fill="#FF7700" />
+                <path d="M 100,77 C 97,84 103,85 100,92 C 103,85 101,80 100,77 Z" fill="#FFD700" />
+                
+                <!-- Bottom Texts -->
+                <text x="100" y="152" fill="#F9E498" font-size="7.5" font-weight="bold" text-anchor="middle" letter-spacing="0.5">EST. 1984</text>
+                <text x="100" y="161" fill="#D4AF37" font-size="6.5" font-weight="bold" text-anchor="middle" letter-spacing="0.5">MENCERDASKAN BANGSA</text>
+            </svg>
+            `;
+            imgElement.outerHTML = svgHtml;
+        }
+    </script>
 </head>
 <body class="flex min-h-screen" onload="init()">
 
@@ -119,22 +190,8 @@
     <aside id="sidebar" class="sidebar h-screen sticky top-0 flex flex-col shrink-0">
         <div class="p-8 text-center flex flex-col items-center">
             <!-- LOGO APLIKASI PERPUSTAKAAN EMAS -->
-            <div class="w-16 h-16 mb-3 flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_4px_10px_rgba(212,175,55,0.3)]">
-                    <path d="M12 21C15.5 17.5 19 16.5 22 16.5V4.5C19 4.5 15.5 5.5 12 9C8.5 5.5 5 4.5 2 4.5V16.5C5 16.5 8.5 17.5 12 21Z" stroke="url(#goldGradientSide)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M12 9V21" stroke="url(#goldGradientSide)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M6 8.5H4" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M18 8.5H20" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M7 12H4" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M17 12H20" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
-                    <defs>
-                        <linearGradient id="goldGradientSide" x1="2" y1="4.5" x2="22" y2="21" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="#996515"/>
-                            <stop offset="50%" stop-color="#D4AF37"/>
-                            <stop offset="100%" stop-color="#F9E498"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
+            <div class="w-20 h-20 mb-3 flex items-center justify-center">
+                <img src="LOGO PERPUSTAKAAN.png" alt="Logo Perpustakaan" class="w-full h-full object-contain" onerror="showSvgLogo(this, 'sidebar')">
             </div>
             <h1 class="text-2xl font-black gold-text tracking-tighter flex items-center justify-center gap-2">
                 LIBRARY
@@ -173,21 +230,7 @@
             <div class="flex items-center gap-4">
                 <!-- LOGO PADA HEADER UTAMA -->
                 <div class="w-12 h-12 shrink-0 hidden sm:flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]">
-                        <path d="M12 21C15.5 17.5 19 16.5 22 16.5V4.5C19 4.5 15.5 5.5 12 9C8.5 5.5 5 4.5 2 4.5V16.5C5 16.5 8.5 17.5 12 21Z" stroke="url(#goldGradientHeader)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 9V21" stroke="url(#goldGradientHeader)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M6 8.5H4" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M18 8.5H20" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M7 12H4" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M17 12H20" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
-                        <defs>
-                            <linearGradient id="goldGradientHeader" x1="2" y1="4.5" x2="22" y2="21" gradientUnits="userSpaceOnUse">
-                                <stop offset="0%" stop-color="#996515"/>
-                                <stop offset="50%" stop-color="#D4AF37"/>
-                                <stop offset="100%" stop-color="#F9E498"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                    <img src="LOGO PERPUSTAKAAN.png" alt="Logo Perpustakaan" class="w-full h-full object-contain" onerror="showSvgLogo(this, 'header')">
                 </div>
                 <div>
                     <h2 id="pageTitle" class="text-3xl font-extrabold text-white">SMP NEGERI 4 MONTA</h2>
@@ -295,7 +338,7 @@
                             <div class="flex items-center gap-1 bg-black/40 p-1.5 rounded-xl border border-white/5">
                                 <select id="aiModeSelect" onchange="toggleKeyInputVisibility()" class="p-2 rounded-lg text-xs font-bold bg-transparent border-none text-white outline-none">
                                     <option value="gemini" selected>Gemini Cloud</option>
-                                    <option value="ollama">Ollama Local (Gemma)</option>
+                                    <option value="ollama">Perpus</option>
                                 </select>
                             </div>
                             <div id="apiKeyContainer" class="flex items-center gap-1 bg-black/40 p-1.5 rounded-xl border border-white/5">
@@ -1005,6 +1048,7 @@ ATURAN MENJAWAB:
             showAlert("📚 Data Koleksi Diperbarui!");
         }
 
+        // RENDER BUKU
         function renderBuku() {
             const query = document.getElementById('searchBuku').value.toLowerCase();
             const filtered = daftarBuku.filter(b => b.judul.toLowerCase().includes(query));
@@ -1123,7 +1167,7 @@ ATURAN MENJAWAB:
                     body: JSON.stringify(updatePayload)
                 });
 
-                // Update lokal setelah berhasil cloud (no-cors tidak bisa baca response, tapi kita asumsikan kirim)
+                // Update lokal setelah berhasil cloud (no-cors tidak bisa baca response, tapi kita asumnsikan kirim)
                 if(buku) buku.stokTersedia += p.qty;
                 listPinjam[idx].ket = "SUDAH DIKEMBALIKAN";
 
@@ -1155,6 +1199,7 @@ ATURAN MENJAWAB:
             document.getElementById('manageList').innerHTML = html;
         }
 
+        // TAMBAH ANGGOTA
         function addMember() {
             const n = document.getElementById('newName').value;
             const d = document.getElementById('newDay').value;
@@ -1201,6 +1246,7 @@ ATURAN MENJAWAB:
         }
 
         // --- UTILS ---
+        // SHOW ALERT
         function showAlert(msg) {
             document.getElementById('alertMessage').innerText = msg;
             document.getElementById('customAlert').classList.remove('hidden');
@@ -1263,6 +1309,7 @@ ATURAN MENJAWAB:
             doc.save("Jadwal_Piket_Perpus.pdf");
         }
 
+        // DOWNLOAD KATALOG
         function downloadRekapKatalog() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
