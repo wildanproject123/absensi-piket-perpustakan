@@ -117,9 +117,27 @@
 
     <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar h-screen sticky top-0 flex flex-col shrink-0">
-        <div class="p-8 text-center">
+        <div class="p-8 text-center flex flex-col items-center">
+            <!-- LOGO APLIKASI PERPUSTAKAAN EMAS -->
+            <div class="w-16 h-16 mb-3 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_4px_10px_rgba(212,175,55,0.3)]">
+                    <path d="M12 21C15.5 17.5 19 16.5 22 16.5V4.5C19 4.5 15.5 5.5 12 9C8.5 5.5 5 4.5 2 4.5V16.5C5 16.5 8.5 17.5 12 21Z" stroke="url(#goldGradientSide)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 9V21" stroke="url(#goldGradientSide)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6 8.5H4" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M18 8.5H20" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M7 12H4" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M17 12H20" stroke="url(#goldGradientSide)" stroke-width="1.5" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="goldGradientSide" x1="2" y1="4.5" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#996515"/>
+                            <stop offset="50%" stop-color="#D4AF37"/>
+                            <stop offset="100%" stop-color="#F9E498"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
             <h1 class="text-2xl font-black gold-text tracking-tighter flex items-center justify-center gap-2">
-                <i class="fas fa-crown"></i> LIBRARY
+                LIBRARY
             </h1>
             <p class="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1">SMP NEGERI 4 MONTA</p>
         </div>
@@ -152,9 +170,29 @@
     <main class="main-content flex-1 min-w-0 p-4 lg:p-10 transition-all">
         
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-            <div>
-                <h2 id="pageTitle" class="text-3xl font-extrabold text-white">SMP NEGERI 4 MONTA</h2>
-                <p id="pageSubtitle" class="text-gray-500 text-sm mt-1">Pantau statistik dan aktivitas kunjungan perpustakaan.</p>
+            <div class="flex items-center gap-4">
+                <!-- LOGO PADA HEADER UTAMA -->
+                <div class="w-12 h-12 shrink-0 hidden sm:flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-[0_2px_8px_rgba(212,175,55,0.25)]">
+                        <path d="M12 21C15.5 17.5 19 16.5 22 16.5V4.5C19 4.5 15.5 5.5 12 9C8.5 5.5 5 4.5 2 4.5V16.5C5 16.5 8.5 17.5 12 21Z" stroke="url(#goldGradientHeader)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 9V21" stroke="url(#goldGradientHeader)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M6 8.5H4" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M18 8.5H20" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M7 12H4" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 12H20" stroke="url(#goldGradientHeader)" stroke-width="1.5" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="goldGradientHeader" x1="2" y1="4.5" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#996515"/>
+                                <stop offset="50%" stop-color="#D4AF37"/>
+                                <stop offset="100%" stop-color="#F9E498"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div>
+                    <h2 id="pageTitle" class="text-3xl font-extrabold text-white">SMP NEGERI 4 MONTA</h2>
+                    <p id="pageSubtitle" class="text-gray-500 text-sm mt-1">Pantau statistik dan aktivitas kunjungan perpustakaan.</p>
+                </div>
             </div>
             <div class="text-right">
                 <p id="currentDate" class="text-xs font-bold text-gray-400 uppercase tracking-widest"></p>
@@ -814,6 +852,7 @@ ATURAN MENJAWAB:
             );
         }
 
+        // FORMAT RESPONSES
         function formatAIResponse(text) {
             let formatted = escapeHTML(text);
             
@@ -1205,6 +1244,7 @@ ATURAN MENJAWAB:
             doc.save(`Presensi_Petugas_${new Date().toLocaleDateString()}.pdf`);
         }
 
+        // DOWNLOADS
         function downloadMasterJadwal() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
